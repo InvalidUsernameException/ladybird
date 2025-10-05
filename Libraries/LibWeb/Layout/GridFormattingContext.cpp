@@ -274,7 +274,7 @@ int GridFormattingContext::count_of_repeated_auto_fill_or_fit_tracks(GridDimensi
     // floor be 1px.
 }
 
-GridFormattingContext::PlacementPosition GridFormattingContext::resolve_grid_position(Box const& child_box, GridDimension dimension)
+GridFormattingContext::PlacementPosition GridFormattingContext::resolve_grid_position(NodeWithStyle const& child_box, GridDimension dimension)
 {
     auto const& computed_values = child_box.computed_values();
     auto const& placement_start = dimension == GridDimension::Row ? computed_values.grid_row_start() : computed_values.grid_column_start();
@@ -2141,18 +2141,63 @@ void GridFormattingContext::layout_absolutely_positioned_element(Box const& box)
         while (containing_grid_item->parent() && containing_grid_item->parent() != &grid_container())
             containing_grid_item = containing_grid_item->parent();
 
-        auto const& computed_values = containing_grid_item->computed_values();
+        // auto const& computed_values = containing_grid_item->computed_values();
         VERIFY(containing_grid_item);
 
-        // NOTE: If abspos box is contained by in-flow grid item its grid position is already determined.
+        Optional<GridItem> to_be_named_item {};
         if (containing_grid_item->is_grid_item()) {
-            auto item = *m_grid_items.find_if([containing_grid_item](GridItem const& grid_item) {
+            to_be_named_item = *m_grid_items.find_if([containing_grid_item](GridItem const& grid_item) {
                 return grid_item.box == containing_grid_item;
             });
-            return get_grid_area_rect(item);
         }
 
-        GridItem item { as<Box>(*containing_grid_item), box_state, {}, {}, {}, {} };
+        GridItem item { box, box_state, {}, {}, {}, {} };
+        // FIXME: This only does auto-behavior if both start end end are auto, but it should do it for just one of them as well.
+
+        auto inset = box.computed_values().inset();
+        if (!inset.left().is_auto() || !inset.right().is_auto() || box.parent() == &grid_container()) {
+            if (!is_auto_positioned_track(box.computed_values().grid_column_start(), box.computed_values().grid_column_end())) {
+
+                auto column_placement_position = resolve_grid_position(box, GridDimension::Column);
+                item.column = column_placement_position.start;
+                item.column_span = column_placement_position.span;
+            }
+        } else if (to_be_named_item.has_value()) {
+            // dbgln("Doing the else for column");
+            if (!is_auto_positioned_track(containing_grid_item->computed_values().grid_column_start(), containing_grid_item->computed_values().grid_column_end())) {
+                auto row_placement_position = resolve_grid_position(*containing_grid_item, GridDimension::Column);
+                item.column = row_placement_position.start;
+                item.column_span = row_placement_position.span;
+            }
+            // item.column = to_be_named_item.value().column;
+            // item.column_span = to_be_named_item.value().column_span;
+        }
+
+        if (!inset.top().is_auto() || !inset.bottom().is_auto() || box.parent() == &grid_container()) {
+            if (!is_auto_positioned_track(box.computed_values().grid_row_start(), box.computed_values().grid_row_end())) {
+                auto row_placement_position = resolve_grid_position(box, GridDimension::Row);
+                item.row = row_placement_position.start;
+                item.row_span = row_placement_position.span;
+            }
+        } else if (to_be_named_item.has_value()) {
+            // dbgln("Doing the else for row");
+            if (!is_auto_positioned_track(containing_grid_item->computed_values().grid_row_start(), containing_grid_item->computed_values().grid_row_end())) {
+                auto row_placement_position = resolve_grid_position(*containing_grid_item, GridDimension::Row);
+                item.row = row_placement_position.start;
+                item.row_span = row_placement_position.span;
+            }
+            // item.row = to_be_named_item.value().row;
+            // item.row_span = to_be_named_item.value().row_span;
+        }
+
+        // dbgln_dump(item.row);
+        // dbgln_dump(item.row_span);
+        // dbgln_dump(item.column);
+        // dbgln_dump(item.column_span);
+
+        return get_grid_area_rect(item);
+
+        /*
         auto is_auto_row = is_auto_positioned_track(computed_values.grid_row_start(), computed_values.grid_row_end());
         auto is_auto_column = is_auto_positioned_track(computed_values.grid_column_start(), computed_values.grid_column_end());
 
@@ -2167,6 +2212,7 @@ void GridFormattingContext::layout_absolutely_positioned_element(Box const& box)
             item.column_span = column_placement_position.span;
         }
         return get_grid_area_rect(item);
+        */
     }();
 
     auto available_width = AvailableSize::make_definite(grid_area_rect.width());

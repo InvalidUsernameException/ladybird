@@ -345,7 +345,7 @@ private:
         int end { 0 };
         size_t span { 1 };
     };
-    PlacementPosition resolve_grid_position(Box const& child_box, GridDimension dimension);
+    PlacementPosition resolve_grid_position(NodeWithStyle const& child_box, GridDimension dimension);
 
     void place_grid_items();
     void place_item_with_row_and_column_position(Box const& child_box);
