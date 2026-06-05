@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <AK/Assertions.h>
 #include <AK/Format.h>
 #include <AK/Forward.h>
@@ -324,18 +322,49 @@ public:
         return delta_alpha * delta_alpha / (2.0f * 255 * 255) + rgb_distance * alpha() * other.alpha() / (255 * 255);
     }
 
-    constexpr u8 luminosity() const
+    // https://w3c.github.io/wcag/guidelines/22//#dfn-relative-luminance
+    constexpr double relative_luminance() const
     {
-        return round_to<u8>(red() * 0.2126f + green() * 0.7152f + blue() * 0.0722f);
+        // For the sRGB colorspace, the relative luminance of a color is defined as
+        // L = 0.2126 * R + 0.7152 * G + 0.0722 * B where R, G and B are defined as:
+        //
+        // - if RsRGB <= 0.04045 then R = RsRGB/12.92 else R = ((RsRGB+0.055)/1.055) ^ 2.4
+        // - if GsRGB <= 0.04045 then G = GsRGB/12.92 else G = ((GsRGB+0.055)/1.055) ^ 2.4
+        // - if BsRGB <= 0.04045 then B = BsRGB/12.92 else B = ((BsRGB+0.055)/1.055) ^ 2.4
+        //
+        // and RsRGB, GsRGB, and BsRGB are defined as:
+        //
+        // - RsRGB = R8bit/255
+        // - GsRGB = G8bit/255
+        // - BsRGB = B8bit/255
+        auto component_value = [](double input) {
+            return input <= 0.04045 ? input / 12.92 : pow((input + 0.055) / 1.055, 2.4);
+        };
+
+        auto RsRGB = red() / 255.0;
+        auto GsRGB = green() / 255.0;
+        auto BsRGB = blue() / 255.0;
+
+        auto r = component_value(RsRGB);
+        auto g = component_value(GsRGB);
+        auto b = component_value(BsRGB);
+
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
     }
 
-    constexpr float contrast_ratio(Color other)
+    // https://w3c.github.io/wcag/guidelines/22/#dfn-contrast-ratio
+    constexpr double contrast_ratio(Color other) const
     {
-        auto l1 = luminosity();
-        auto l2 = other.luminosity();
-        auto darkest = min(l1, l2) / 255.;
-        auto brightest = max(l1, l2) / 255.;
-        return (brightest + 0.05) / (darkest + 0.05);
+        // (L1 + 0.05) / (L2 + 0.05), where
+        //
+        // - L1 is the relative luminance of the lighter of the colors, and
+        // - L2 is the relative luminance of the darker of the colors.
+        auto own_luminance = relative_luminance();
+        auto other_luminance = other.relative_luminance();
+
+        auto l1 = max(own_luminance, other_luminance);
+        auto l2 = min(own_luminance, other_luminance);
+        return (l1 + 0.05) / (l2 + 0.05);
     }
 
     constexpr Color sepia(float amount = 1.0f) const
@@ -459,7 +488,7 @@ public:
 
     constexpr Color suggested_foreground_color() const
     {
-        return luminosity() < 128 ? Color::White : Color::Black;
+        return relative_luminance() < 128 ? Color::White : Color::Black;
     }
 
 private:

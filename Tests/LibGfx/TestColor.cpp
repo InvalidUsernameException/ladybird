@@ -81,3 +81,76 @@ TEST_CASE(hsl)
     EXPECT_EQ(Color(128, 175, 80), Color::from_hsl(90, 0.375, 0.5));
     EXPECT_EQ(Color(128, 159, 96), Color::from_hsl(90, 0.25, 0.5));
 }
+
+// Test cases based on https://www.cedc.tools/article.html
+TEST_CASE(contrast_ratio_grayscale_against_black_and_white)
+{
+    auto white = Color(Color::White);
+    auto black = Color(Color::Black);
+
+    EXPECT_EQ(white.contrast_ratio(white), 1.0);
+    EXPECT_EQ(white.contrast_ratio(black), 21.0);
+    EXPECT_EQ(black.contrast_ratio(black), 1.0);
+    EXPECT_EQ(black.contrast_ratio(white), 21.0);
+
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(100, 100, 100).contrast_ratio(white), 5.9, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(118, 118, 118).contrast_ratio(white), 4.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(127, 127, 127).contrast_ratio(white), 4.0, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(136, 136, 136).contrast_ratio(white), 3.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(140, 140, 140).contrast_ratio(white), 3.4, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(145, 145, 145).contrast_ratio(white), 3.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(154, 154, 154).contrast_ratio(white), 2.8, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(163, 163, 163).contrast_ratio(white), 2.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(172, 172, 172).contrast_ratio(white), 2.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(210, 210, 210).contrast_ratio(white), 1.5, 0.05);
+
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(100, 100, 100).contrast_ratio(black), 3.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(118, 118, 118).contrast_ratio(black), 4.6, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(127, 127, 127).contrast_ratio(black), 5.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(136, 136, 136).contrast_ratio(black), 5.9, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(140, 140, 140).contrast_ratio(black), 6.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(145, 145, 145).contrast_ratio(black), 6.7, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(154, 154, 154).contrast_ratio(black), 7.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(163, 163, 163).contrast_ratio(black), 8.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(172, 172, 172).contrast_ratio(black), 9.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(210, 210, 210).contrast_ratio(black), 13.9, 0.05);
+}
+
+// Test cases based on https://www.cedc.tools/article.html
+TEST_CASE(contrast_ratio_color_against_black_and_white)
+{
+    auto white = Color(Color::White);
+    auto black = Color(Color::Black);
+
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(0, 128, 208).contrast_ratio(white), 4.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(106, 126, 170).contrast_ratio(white), 4.1, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(1, 134, 107).contrast_ratio(white), 4.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(165, 100, 206).contrast_ratio(white), 4.0, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(4, 143, 28).contrast_ratio(white), 4.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(227, 64, 172).contrast_ratio(white), 3.8, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(195, 106, 107).contrast_ratio(white), 3.8, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(150, 124, 2).contrast_ratio(white), 4.1, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(240, 51, 8).contrast_ratio(white), 4.1, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(89, 143, 60).contrast_ratio(white), 3.9, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(211, 33, 241).contrast_ratio(white), 4.0, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(44, 107, 255).contrast_ratio(white), 4.5, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(51, 129, 171).contrast_ratio(white), 4.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(112, 113, 243).contrast_ratio(white), 3.9, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(56, 137, 3).contrast_ratio(white), 4.4, 0.05);
+
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(0, 128, 208).contrast_ratio(black), 5.0, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(106, 126, 170).contrast_ratio(black), 5.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(1, 134, 107).contrast_ratio(black), 4.6, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(165, 100, 206).contrast_ratio(black), 5.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(4, 143, 28).contrast_ratio(black), 5.0, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(227, 64, 172).contrast_ratio(black), 5.6, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(195, 106, 107).contrast_ratio(black), 5.6, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(150, 124, 2).contrast_ratio(black), 5.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(240, 51, 8).contrast_ratio(black), 5.2, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(89, 143, 60).contrast_ratio(black), 5.4, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(211, 33, 241).contrast_ratio(black), 5.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(44, 107, 255).contrast_ratio(black), 4.7, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(51, 129, 171).contrast_ratio(black), 4.9, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(112, 113, 243).contrast_ratio(black), 5.3, 0.05);
+    EXPECT_APPROXIMATE_WITH_ERROR(Color(56, 137, 3).contrast_ratio(black), 4.7, 0.05);
+}

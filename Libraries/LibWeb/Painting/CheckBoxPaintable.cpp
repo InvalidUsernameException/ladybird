@@ -73,7 +73,7 @@ void CheckBoxPaintable::paint(DisplayListRecordingContext& context, PaintPhase p
     auto input_colors = compute_input_colors(computed_values().color_scheme(), computed_values().accent_color());
 
     auto increase_contrast = [&](Color color, Color background) {
-        auto constexpr min_contrast = 2;
+        auto constexpr min_contrast = 3;
         if (color.contrast_ratio(background) < min_contrast) {
             color = color.inverted();
             if (color.contrast_ratio(background) > min_contrast)
