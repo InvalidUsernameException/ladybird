@@ -148,17 +148,10 @@ Optional<Color> KeywordStyleValue::to_color(ColorResolutionContext color_resolut
 
     // Calculate accent_color_text based on contrast to accent_color
     if (keyword() == Keyword::Accentcolortext) {
-        // min_contrast = 10.2 is a magic number which provides the best accessibility trade-off based on:
-        // 1. https://webaim.org/resources/contrastchecker/
-        // 2. Current implementation of luminosity() and contrast_ratio() methods for Color instances
-
-        // the baseline colors with the least contrast from black and white are #757575 and #767676
-        // which score over 4.5 ratio for #fff and #000 accent_color_text values correspondingly
-        auto constexpr min_contrast = 10.2;
+        auto accent_color = color_resolution_context.accent_color.value_or(SystemColor::accent_color(scheme));
         auto system_accent_text = SystemColor::accent_color_text(scheme);
-
-        if (color_resolution_context.accent_color.value_or(SystemColor::accent_color(scheme)).contrast_ratio(system_accent_text) < min_contrast)
-            return system_accent_text.inverted();
+        if (accent_color.contrast_ratio(system_accent_text) < accent_color.contrast_ratio(system_accent_text.inverted()))
+            system_accent_text = system_accent_text.inverted();
 
         return system_accent_text;
     }
