@@ -115,9 +115,11 @@ Color transform_selection_background_color(Color color)
     return result;
 }
 
-Color highlight(PreferredColorScheme)
+Color highlight(PreferredColorScheme scheme)
 {
-    return Color(61, 174, 233, 128);
+    auto highlight_color = SystemColor::accent_color(scheme);
+    highlight_color.set_alpha(128);
+    return highlight_color;
 }
 
 Color highlight_text(PreferredColorScheme scheme)
@@ -146,9 +148,9 @@ Color mark_text(PreferredColorScheme)
     return Color(0, 0, 0);
 }
 
-Color selected_item(PreferredColorScheme)
+Color selected_item(PreferredColorScheme scheme)
 {
-    return Color(61, 174, 233);
+    return SystemColor::accent_color(scheme);
 }
 
 Color selected_item_text(PreferredColorScheme scheme)
