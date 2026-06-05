@@ -10,7 +10,7 @@ namespace Web::CSS::SystemColor {
 
 Color accent_color(PreferredColorScheme)
 {
-    return Color(61, 174, 233);
+    return Color(26, 156, 224);
 }
 
 Color active_text(PreferredColorScheme scheme)
