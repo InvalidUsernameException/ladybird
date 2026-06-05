@@ -56,8 +56,8 @@ void RadioButtonPaintable::paint(DisplayListRecordingContext& context, PaintPhas
     auto radio_color = [&] {
         if (radio_button.checked()) {
             // Handle the awkward case where a light color has been used for the accent color.
-            if (accent.contrast_ratio(background_color) < 2 && accent.contrast_ratio(input_colors.dark_gray) > 2)
-                background_color = input_colors.dark_gray;
+            if (accent.contrast_ratio(background_color) < 2 && accent.contrast_ratio(background_color.inverted()) > 2)
+                background_color = background_color.inverted();
             return accent;
         }
         return input_colors.gray;
