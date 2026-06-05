@@ -1406,7 +1406,7 @@ void PaintableBox::paint_grid_inspector_overlay(DisplayListRecordingContext& con
             auto label_background = color.with_alpha(235);
             context.display_list_recorder().fill_rect(label_device_rect, label_background);
             context.display_list_recorder().draw_rect(label_device_rect, color.with_alpha(255));
-            context.display_list_recorder().draw_text(label_device_rect, text, label_font, Gfx::TextAlignment::Center, label_background.suggested_foreground_color());
+            context.display_list_recorder().draw_text(label_device_rect, text, label_font, Gfx::TextAlignment::Center, label_background.contrast_color());
         };
 
         auto paint_centered_label = [&](CSSPixelRect const& rect, Utf16String const& text) {

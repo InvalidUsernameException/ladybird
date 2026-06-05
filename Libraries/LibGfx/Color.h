@@ -367,15 +367,23 @@ public:
         return (l1 + 0.05) / (l2 + 0.05);
     }
 
+    constexpr Color contrast_color(Color preferred_color, Color fallback_color, Optional<double> min_contrast = {})
+    {
+        auto preferred_contrast = contrast_ratio(preferred_color);
+        auto fallback_contrast = contrast_ratio(fallback_color);
+        if (min_contrast.has_value() && preferred_contrast >= min_contrast.value())
+            return preferred_color;
+
+        return preferred_contrast >= fallback_contrast ? preferred_color : fallback_color;
+    }
+
     // https://drafts.csswg.org/css-color-5/#funcdef-contrast-color
     constexpr Color contrast_color()
     {
         // contrast-color() resolves to either white or black, whichever produces maximum color contrast for text when
         // the input color is used as a solid background. If both white and black produce the same contrast, it resolves
         // to white.
-        auto white_contrast = contrast_ratio(Color::White);
-        auto black_contrast = contrast_ratio(Color::Black);
-        return white_contrast >= black_contrast ? Color::White : Color::Black;
+        return contrast_color(Color::White, Color::Black);
     }
 
     constexpr Color sepia(float amount = 1.0f) const
@@ -495,11 +503,6 @@ public:
         auto out_g = static_cast<u8>(round(srgb[1] * 255));
         auto out_b = static_cast<u8>(round(srgb[2] * 255));
         return Color(out_r, out_g, out_b);
-    }
-
-    constexpr Color suggested_foreground_color() const
-    {
-        return relative_luminance() < 128 ? Color::White : Color::Black;
     }
 
 private:

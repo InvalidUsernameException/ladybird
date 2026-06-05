@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include <LibGfx/WcagMinimumContrastRatio.h>
 #include <LibWeb/DOM/Document.h>
 #include <LibWeb/HTML/BrowsingContext.h>
 #include <LibWeb/HTML/HTMLInputElement.h>
@@ -54,11 +55,9 @@ void RadioButtonPaintable::paint(DisplayListRecordingContext& context, PaintPhas
     auto accent = input_colors.accent;
 
     auto radio_color = [&] {
-        auto constexpr min_contrast = 3;
         if (radio_button.checked()) {
             // Handle the awkward case where a light color has been used for the accent color.
-            if (accent.contrast_ratio(background_color) < min_contrast && accent.contrast_ratio(background_color.inverted()) > min_contrast)
-                background_color = background_color.inverted();
+            background_color = accent.contrast_color(background_color, background_color.inverted(), Gfx::WcagMinimumContrastRatio::UserInterfaceComponents);
             return accent;
         }
         return input_colors.gray;
