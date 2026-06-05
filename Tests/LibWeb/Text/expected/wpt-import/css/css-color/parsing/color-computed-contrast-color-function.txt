@@ -1,0 +1,23 @@
+Harness status: OK
+
+Found 17 tests
+
+15 Pass
+2 Fail
+Pass	Property background-color value 'contrast-color(white)'
+Pass	Property background-color value 'contrast-color(black)'
+Pass	Property background-color value 'contrast-color(pink)'
+Pass	Property background-color value 'contrast-color(color(srgb 1 0 1 / 0.5))'
+Pass	Property background-color value 'contrast-color(lab(0.2 0.5 0.2))'
+Pass	Property background-color value 'contrast-color(color(srgb 10 10 10))'
+Pass	Property background-color value 'contrast-color(color(srgb -10 -10 -10))'
+Pass	Property background-color value 'contrast-color(contrast-color(pink))'
+Pass	Property background-color value 'contrast-color(currentcolor)'
+Pass	Property background-color value 'contrast-color(color(srgb calc(1 + 1 / 1) calc(1 + 1 / 1) calc(1 + 1 / 1)))'
+Pass	Property background-color value 'color-mix(in srgb, contrast-color(blue) 100%, purple)'
+Fail	Property background-color value 'rgb(from contrast-color(blue) r g b)'
+Pass	Property background-color value 'contrast-color(color-mix(blue, green))'
+Fail	Property background-color value 'contrast-color(rgb(from orange r g b))'
+Pass	Property background-color value 'contrast-color(buttonface)'
+Pass	Property background-color value 'contrast-color(transparent)'
+Pass	Property background-color value 'contrast-color(rgba(255, 255, 255, 0.2))'

@@ -38,6 +38,7 @@
 #include <LibWeb/CSS/StyleValues/ColorMixStyleValue.h>
 #include <LibWeb/CSS/StyleValues/ColorStyleValue.h>
 #include <LibWeb/CSS/StyleValues/ConicGradientStyleValue.h>
+#include <LibWeb/CSS/StyleValues/ContrastColorStyleValue.h>
 #include <LibWeb/CSS/StyleValues/CounterDefinitionsStyleValue.h>
 #include <LibWeb/CSS/StyleValues/CounterStyleStyleValue.h>
 #include <LibWeb/CSS/StyleValues/CounterStyleValue.h>
@@ -2143,6 +2144,31 @@ RefPtr<StyleValue const> Parser::parse_color_mix_function(TokenStream<ComponentV
     return ColorMixStyleValue::create(move(color_interpolation_method), move(*first_component), move(*second_component));
 }
 
+// https://drafts.csswg.org/css-color-5/#funcdef-contrast-color
+RefPtr<StyleValue const> Parser::parse_contrast_color_function(TokenStream<ComponentValue>& outer_tokens)
+{
+    auto transaction = outer_tokens.begin_transaction();
+    outer_tokens.discard_whitespace();
+
+    auto const& function_token = outer_tokens.consume_a_token();
+    if (!function_token.is_function("contrast-color"sv))
+        return {};
+
+    auto inner_tokens = TokenStream { function_token.function().value };
+    inner_tokens.discard_whitespace();
+
+    auto inner_color = parse_color_value(inner_tokens);
+    if (!inner_color)
+        return {};
+
+    inner_tokens.discard_whitespace();
+    if (inner_tokens.has_next_token())
+        return {};
+
+    transaction.commit();
+    return ContrastColorStyleValue::create(inner_color.release_nonnull());
+}
+
 // https://drafts.csswg.org/css-color-5/#funcdef-light-dark
 RefPtr<StyleValue const> Parser::parse_light_dark_color_value(TokenStream<ComponentValue>& outer_tokens)
 {
@@ -2195,6 +2221,9 @@ RefPtr<StyleValue const> Parser::parse_color_value(TokenStream<ComponentValue>& 
         return color;
 
     if (auto color = parse_color_mix_function(tokens))
+        return color;
+
+    if (auto color = parse_contrast_color_function(tokens))
         return color;
 
     if (auto rgb = parse_rgb_color_value(tokens))

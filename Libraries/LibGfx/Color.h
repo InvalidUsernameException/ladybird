@@ -367,6 +367,17 @@ public:
         return (l1 + 0.05) / (l2 + 0.05);
     }
 
+    // https://drafts.csswg.org/css-color-5/#funcdef-contrast-color
+    constexpr Color contrast_color()
+    {
+        // contrast-color() resolves to either white or black, whichever produces maximum color contrast for text when
+        // the input color is used as a solid background. If both white and black produce the same contrast, it resolves
+        // to white.
+        auto white_contrast = contrast_ratio(Color::White);
+        auto black_contrast = contrast_ratio(Color::Black);
+        return white_contrast >= black_contrast ? Color::White : Color::Black;
+    }
+
     constexpr Color sepia(float amount = 1.0f) const
     {
         auto blend_factor = 1.0f - amount;
