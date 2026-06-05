@@ -13,11 +13,6 @@ Color accent_color(PreferredColorScheme)
     return Color(61, 174, 233);
 }
 
-Color accent_color_text(PreferredColorScheme)
-{
-    return Color(0, 0, 0);
-}
-
 Color active_text(PreferredColorScheme scheme)
 {
     if (scheme == PreferredColorScheme::Dark) {

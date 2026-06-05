@@ -14,7 +14,6 @@
 namespace Web::CSS::SystemColor {
 
 Color accent_color(PreferredColorScheme);
-Color accent_color_text(PreferredColorScheme);
 Color active_text(PreferredColorScheme);
 Color button_border(PreferredColorScheme);
 Color button_face(PreferredColorScheme);
